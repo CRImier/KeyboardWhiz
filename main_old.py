@@ -5,8 +5,10 @@ from copy import copy
 from collections import OrderedDict
 
 bus = smbus.SMBus(1)
-a1 = 0x21
-a2 = 0x22
+#a1 = 0x21
+#a2 = 0x22
+a1 = 0x25
+a2 = 0x26
 
 # MCP23017 register descriptions
        #i  a   io    pu   read  write, str
