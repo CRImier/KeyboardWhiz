@@ -1,0 +1,8 @@
+datasheet*.pdf
+keebs/
+crowdfunding/
+pics/
+
+*.swp
+*.pyc
+*.txt
