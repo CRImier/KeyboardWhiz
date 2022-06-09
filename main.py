@@ -216,7 +216,7 @@ def print_broken_keys():
   if info.get("broken_keys", []):
     print("This keyboard file has keys {} marked as broken".format(", ".join(info["broken_keys"])))
 
-bus = smbus.SMBus(5)
+bus = smbus.SMBus(1)
 a1 = 0x21
 a2 = 0x22
 #a1 = 0x25
