@@ -63,14 +63,15 @@ Then, `cd KeyboardWhiz/`.
 
 ## Running the main script 
 
-Run it with `sudo python3 -i main.py`. `sudo` might not be needed if you're running on a Raspberry Pi -
+To start working with a keyboard, run the script like `sudo python3 -i main.py`. `sudo` might not be needed if you're running on a Raspberry Pi -
 it's for I2C device access, which Raspbian probably already has proper permissions set up for.
 
 By default, each time you run the script like `sudo python3 -i main.py`, it will assume you're working with a new keyboard,
 and it will create a new JSON file in `keebs/`. It creates files like `keebs/keeb_YYMMDD_HHMMSS.json`,
 where `YYMMDD_HHMMSS` is a timestamp.
 
-To work with an already created file for a keyboard, run `sudo python3 -i main.py keebs/keeb_YYMMDD_HHMMSS.json` insteada.
+To continue working with an already created keyboard file (scanning new keys, adding metadata, or whatever else),
+run `sudo python3 -i main.py keebs/keeb_YYMMDD_HHMMSS.json` instead.
 For ease of use, you can input `sudo python3 -i main.py keebs/keeb_` and then press Tab one or two times - it will show you
 all the keyboard JSON file names available, so that you don't have to copy-paste and can see which files you have.
 
@@ -88,7 +89,7 @@ as in, a timestamp. Feel free to rename the JSON file at any point.
 
 You might need to enable the I2C device with `raspi-config`, and on x86 platforms, you might need to `sudo modprobe i2c-dev`.
 To determine the bus that the KeyboardWhiz is attached to, see which device numbers you have in `/dev/i2c`, as in, run `ls /dev/i2c-*`.
-For each bus number there, run `sudo i2cdetect -y %BUS_NUM%, substituting the bus number into `%BUS_NUM%`, for instance,
+For each bus number there, run `sudo i2cdetect -y %BUS_NUM%`, substituting the bus number into `%BUS_NUM%`, for instance,
 `sudo i2cdetect -y 1` and forth. One of these buses should have `21` and `22` - that'll be the bus you have the KeyboardWhiz
 connected to.
 
