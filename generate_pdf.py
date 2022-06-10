@@ -25,9 +25,14 @@ keeb_name = keeb_data.get("file_name", keeb_data.get("name", keeb_file.rsplit('/
 if "lang" in keeb_data:
     keeb_name = keeb_name+'-'+keeb_data["lang"]
 
-print("Filename: datasheet_{}.pdf".format(keeb_name.lower()))
+try:
+    os.mkdir('datasheets/')
+except FileExistsError:
+    pass
 
-doc = SimpleDocTemplate("datasheet_{}.pdf".format(keeb_name.lower()), pagesize=portrait(A4),
+print("Filename: datasheets/datasheet_{}.pdf".format(keeb_name.lower()))
+
+doc = SimpleDocTemplate("datasheet/datasheet_{}.pdf".format(keeb_name.lower()), pagesize=portrait(A4),
                         rightMargin=72,leftMargin=72,
                         topMargin=40,bottomMargin=0)
 elements = []
