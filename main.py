@@ -223,7 +223,13 @@ def print_broken_keys():
   if info.get("broken_keys", []):
     print("This keyboard file has keys {} marked as broken".format(", ".join(info["broken_keys"])))
 
-bus = smbus.SMBus(1)
+bus_num = 8
+try:
+    bus = smbus.SMBus(bus_num)
+except (PermissionError, IOError, FileNotFoundError):
+    print("WARNING: I can't open bus {}!".format(bus_num))
+    #traceback.print_exc()
+
 a1 = 0x21
 a2 = 0x22
 #a1 = 0x25
@@ -266,11 +272,11 @@ def stdin_readall():
 
 def test_expander_presence():
     ep_addrs = list(set([a for _, a, i, p, r, w, _ in eps]))
-    try:
-      for ep_addr in ep_addrs:
+    for ep_addr in ep_addrs:
+      try:
         gmr(ep_addr, 0x00) # just reading some register
-    except IOError:
-        print("WARNING: I can't find the expander at {}!".format(hex))
+      except (NameError, IOError):
+        print("WARNING: I can't find the expander at {}, bus {}!".format(hex(ep_addr), bus_num))
 
 def setup_for_key_scanning():
     for _, a, i, p, r, w, _ in eps:
