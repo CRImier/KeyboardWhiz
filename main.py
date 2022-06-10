@@ -127,14 +127,14 @@ def get_metadata():
     if " " in info["name"]:
         get_string("file_name", "Oh, that's good info! Thank you! Any short name that could be used for the datasheet filename?")
     get_string("lang", "Do you know the keyboard language? Maybe there's a language code on the label? I.e. US/UI/INTL/UK/SD/RU etc.")
+    get_string("laptop_mfg", "Do you know the manufacturer of the laptop that this keyboard was used with?")
+    get_string("laptop", "Do you know what laptop model this keyboard was used with?")
     # let's see if we can provide a manufacturer hint to the user
     if not info.get("keeb_mfg", ""):
         # Darfon heuristic - keyboard code starts with NSK-
         if "NSK-" in info.get("name", "") or info.get("file_name", "").startswith("NSK-"):
             print("This looks like a Darfon-manufactured keyboard!")
     get_string("keeb_mfg", "Any idea on the keyboard manufacturer? Could be someone like \"Chicony\" or \"Darfon\".")
-    get_string("laptop_mfg", "Do you know the manufacturer of the laptop that this keyboard was used with?")
-    get_string("laptop", "Do you know what laptop model this keyboard was used with?")
     get_string("pitch", "What is the pin pitch on your FPC? I.e. 1mm/0.8mm/0.5mm/other.")
     get_int("pin_count", "What's the amount of pins on your keyboard's FPC?")
     get_bool("has_numpad", "Does your keyboard have a numpad?")
