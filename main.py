@@ -1,10 +1,10 @@
 import traceback
-import datetime
 import select
 import string
 import time
 import json
 import sys
+import os
 
 from copy import copy
 from datetime import datetime
@@ -46,7 +46,14 @@ def info_normalize():
     for key, value in info.get("raw_fn_keys", {}).items():
         info["raw_fn_keys"][key] = key_translations.get(value, value).upper()
 
-# Loading the file
+# Creating the directory if it doesn't exist
+
+try:
+    os.mkdir('keebs/')
+except FileExistsError:
+    pass
+
+# Loading the file or creating a new one
 
 if len(sys.argv) > 1:
     filename = sys.argv[1]
