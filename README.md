@@ -63,8 +63,8 @@ Then, `cd KeyboardWhiz/`.
 
 ## Running the main script 
 
-Run it with `sudo python3 -i main.py`. `sudo` might not be needed if you're running on a Raspberry Pi
-- it's for I2C device access, which Raspbian probably already has proper permissions set up for.
+Run it with `sudo python3 -i main.py`. `sudo` might not be needed if you're running on a Raspberry Pi -
+it's for I2C device access, which Raspbian probably already has proper permissions set up for.
 
 By default, each time you run the script like `sudo python3 -i main.py`, it will assume you're working with a new keyboard,
 and it will create a new JSON file in `keebs/`. It creates files like `keebs/keeb_YYMMDD_HHMMSS.json`,
@@ -83,19 +83,20 @@ The script is flexible like that - you can edit keyboard data and/or scan new ke
 If you mark some of the keys as broken and then later manage to fix them, the script
 will notice that and un-mark them as broken.
 
-Keyboards are saved into `keebs/` folder, with the default filename generated as `keeb_YYMMDD_HHMMSS.json`
-- as in, a timestamp. Feel free to rename the JSON file at any point.
+Keyboards are saved into `keebs/` folder, with the default filename generated as `keeb_YYMMDD_HHMMSS.json` -
+as in, a timestamp. Feel free to rename the JSON file at any point.
 
 You might need to enable the I2C device with `raspi-config`, and on x86 platforms, you might need to `sudo modprobe i2c-dev`.
 To determine the bus that the KeyboardWhiz is attached to, see which device numbers you have in `/dev/i2c`, as in, run `ls /dev/i2c-*`.
 For each bus number there, run `sudo i2cdetect -y %BUS_NUM%, substituting the bus number into `%BUS_NUM%`, for instance,
-`sudo i2cdetect -y 1` and forth.
+`sudo i2cdetect -y 1` and forth. One of these buses should have `21` and `22` - that'll be the bus you have the KeyboardWhiz
+connected to.
 
 Then, adjust the `bus_num = 1` line in the script as needed - `1` works for Raspberry Pi, my laptop with a HDMI-I2C adapter needs 5,
 yours might differ.
 
 To find the line you need to adjust for changing the bus number, do `nano main.py`, then press Ctrl+W, input `bus_num =` and press Enter,
-it'll get you straight to the line in question.
+it'll get you straight to the line in question. Change the number, press Ctrl+S to save the file, then Ctrl+X to exit.
 
 ## Generating PDFs
 
@@ -108,7 +109,7 @@ where `YYMMDD_HHMMSS` is a timestamp. For ease of use,
 you can input `python generate_pdf.py keebs/keeb_` and then press Tab one or two times - it will show you
 all the keyboard JSON file names available, so that you don't have to copy-paste and can see which files you have.
 
-The datasheet will be saved in `datasheets/datasheet_NAME.pdf`; the exact filename will be printed after the script runs.
+The datasheet will be saved in `datasheets/datasheet_NAME.pdf`; the exact filename will be printed after the PDF generation script runs.
 
 ## Updating this code
 
