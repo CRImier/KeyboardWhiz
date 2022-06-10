@@ -68,7 +68,7 @@ if len(sys.argv) > 1:
         print("Loaded {}".format(filename))
         new_file = False
 else:
-    ts = datetime.strftime(datetime.now(), "%d%m%y_%H%M%S")
+    ts = datetime.strftime(datetime.now(), "%y%m%d_%H%M%S")
     filename = "keebs/keeb_{}.json".format(ts)
     info = {}
     new_file = True
