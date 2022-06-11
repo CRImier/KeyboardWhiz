@@ -726,9 +726,10 @@ def print_filename():
     print("Current file is", filename)
 
 def exit():
-    r = input("Save before exiting? (y/n) ")
-    if r.lower().startswith('y'):
-        save()
+    if not last_action_was_save:
+        r = input("Save before exiting? (Y/n) ")
+        if not r or r.lower().startswith('y'):
+            save()
     print_filename()
     sys.exit(0)
 
@@ -746,7 +747,11 @@ menu_entries = [
     #["Generate PDF", generate_pdf]
 ]
 
+# for removing redundant 'wanna save' on exit if you've just saved the data
+last_action_was_save = False
+
 def main_menu():
+    global last_action_was_save
     do_not_print = False
     def get_entry_num():
         while True:
@@ -779,6 +784,7 @@ def main_menu():
             do_not_print = menu_entries[num][2]
             if not do_not_print:
                 print("-"*20)
+            last_action_was_save = menu_entries[num][1] == save
 
 def main():
     print(welcome_msg)
