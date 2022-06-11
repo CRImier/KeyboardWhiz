@@ -165,7 +165,7 @@ def get_basic_metadata():
     process_metadata()
 
 def get_help_shorthand():
-    return "(n/f/r/x/b/p/e/?)"
+    return "(n/f/r/x/b/s/p/e/?)"
 
 def help_offer():
     print("Press '?'+Enter on your PC's keyboard (or just Enter alone) to see available commands")
@@ -176,6 +176,7 @@ def show_help():
     print("Press 'r'+Enter if the key is bRoken on your keyboard and doesn't register.")
     print("Press 'x'+Enter to add an eXtra key. For a key that'd be called KEY_NAME, enter the NAME part.")
     print("Press 'b' to go Back one key in case you pressed one or more keys incorrectly.")
+    print("Press 's' to Skip broken key re-scanning. (is a toggle)")
     print("Press 'p' to Print the current key again.")
     print("Press 'e' to End scanning.")
     print("Press '?' or just Enter to show this Help again")
@@ -345,6 +346,7 @@ def scan_usual_keys(extra_keys = False):
  expected_key_index = 0 # index in the list of the expected keys
  next_key_is_fn = False
  key_input_done = False
+ skip_broken_keys = False
  if "raw" not in info:
     data = {} # dict that will have initial keyboard data
     info["raw"] = data
@@ -389,7 +391,11 @@ def scan_usual_keys(extra_keys = False):
     new_key_trans = key_translations.get(new_key, new_key).upper()
     skipped_keys = info.get("skipped_keys", [])
     fn_keys = info.get("raw_fn_keys", {}).values()
-    while new_key_trans in info["raw"].values() or new_key in skipped_keys or new_key_trans in fn_keys:
+    broken_keys = info.get("broken_keys", [])
+    while new_key_trans in info["raw"].values() \
+      or new_key in skipped_keys \
+      or new_key_trans in fn_keys \
+      or (skip_broken_keys and new_key in broken_keys):
         expected_key_index += 1
         if not key_skipped:
             print("skipping key", new_key, end='')
@@ -560,9 +566,13 @@ def scan_usual_keys(extra_keys = False):
                 go_back()
                 prompt_key()
                 next_key_is_fn = False
+            elif s == 's': # skip broken keys - toggle
+                skip_broken_keys = not skip_broken_keys
+                if advance_expected_key(increment_first=False) is None and not extra_keys: # we ran out of keys!
+                    print(''); return info
             elif s == 'p': # prompt
                 print(''); prompt_key()
-            elif s == 'e': # prompt
+            elif s == 'e': # exit
                 print(''); return info
             elif s in ('?', ''):
                 show_help()
