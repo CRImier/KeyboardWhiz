@@ -192,6 +192,7 @@ def remove_key_from_data(key):
             if v == key:
                 info["raw"].pop(k)
                 removed = True
+                break
     return removed
 
 def remove_key_ui():
@@ -267,7 +268,7 @@ def print_broken_keys():
   if info.get("broken_keys", []):
     print("This keyboard file has keys {} marked as broken".format(", ".join(info["broken_keys"])))
 
-bus_num = 8
+bus_num = 1
 try:
     bus = smbus.SMBus(bus_num)
 except (PermissionError, IOError, FileNotFoundError):
@@ -367,7 +368,7 @@ def scan_usual_keys(extra_keys = False):
 
  def get_last_pressed_key():
     last_pressed_key = keys_to_press[expected_key_index-1]
-    return key_translations.get(last_pressed_key, last_pressed_key)
+    return key_translations.get(last_pressed_key, last_pressed_key).upper()
 
  def go_back():
     nonlocal expected_key_index
@@ -703,8 +704,8 @@ def get_table():
     info["rows"] = rows
     info["columns"] = columns
 
-    print("Rows:", rows)
-    print("Columns:", columns)
+    print(len(rows), "rows:", rows)
+    print(len(columns), "columns:", columns)
 
     # pin table
     table = dict([[row, {}] for row in rows])
