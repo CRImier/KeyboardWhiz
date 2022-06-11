@@ -11,10 +11,11 @@ For PCB files, [refer here](https://github.com/CRimier/MyKiCad/tree/master/Rever
 - Keyboard metadata input
 - Copious amounts of hand-holding (the non-lewd kind)
 - Short-circuited pin detection
-- UK keyboard layout extra support
+- UK and SD (scandinavian) keyboard layout ease-of-use additions
 - User-friendly menu
 - Ability to drop into a Python shell where called for
 - Ability to work without the KeyboardWhiz hardware connected
+- Support for inserting the keyboard FPC into the connector with an offset
 
 ## Features soon to be enabled/added
 
@@ -24,11 +25,9 @@ and I'll see if I can find a bit of time to help you with it.
 - Color the main.py output
 - LED scanning support
 - Fn layer data parsing
-- Convenient support for SD (scandinavian) keyboard extra keys
 - Saving the keyboard data more often
 - Renaming the JSON file from a menu
 - Better datasheet generation - actually containing all the info
-- Support for inserting the keyboard FPC into the connector with an offset
 - Media key support - can be done through extra key addition now, but isn't as convenient
 - Small HTTP server script so you can easily get the JSON and PDF files off your RPi. For now, feel free to use `python3 -m http.server`.
 - Key verification after decoding (pressing keys and verifying these are the right keys). Can kinda be done in extra key scanning mode already.
@@ -52,6 +51,11 @@ but the backend is not yet there, sadly. Working on it!
 I only need the JSON file - PDF can always be generated from the JSON.
 
 ## Prerequisites
+
+You need a Linux computer with an I2C port. A Raspberry Pi will work wonders, and so will
+any computer with I2C available, i.e. your laptop/desktop with I2C obtained from a VGA/HDMI/etc. slot.
+
+Dependencies (Debian/Ubuntu derivatives):
 
 - `sudo apt install python3-smbus` for the main script
 - `sudo apt install python3-reportlab` for PDF generation
