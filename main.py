@@ -32,13 +32,20 @@ keys_to_press = ["Esc"] +\
                 ['Up', 'Down', 'Left', 'Right'] +\
                 ["Home", "Page Up", "Page Down", "End"]
 
+intl_keys_to_press = copy(keys_to_press)
+
 # Additional keys to press if the keyboard has a numpad
 numpad_keys_to_press =  ["KP{}".format(i) for i in range(10)] +\
                         ["KPDOT", "KPENTER", "KPPLUS", "KPMINUS"] +\
                         ["KPMUL", "KPDIV", "NUMLOCK"]
 
 # User-friendly names
-key_translations = {".":"DOT", ",":"COMMA", "/":"SLASH", "'":"APOSTROPHE", "[":"LBRACE", "]":"RBRACE", "=": "EQUAL", "-":"MINUS", "`":"GRAVE", "\\":"BACKSLASH", ";":"SEMICOLON", "Left SHIFT":"LEFTSHIFT", "Right SHIFT":"RIGHTSHIFT", "Left ALT":"LEFTALT", "Right ALT":"RIGHTALT", "Win":"LEFTMETA", "Page Up":"PGUP", "Page Down":"PGDOWN", "#":"HASH"}
+key_translations = {".":"DOT", ",":"COMMA", "/":"SLASH", "'":"APOSTROPHE", "[":"LBRACE", "]":"RBRACE", \
+                    "=": "EQUAL", "-":"MINUS", "`":"GRAVE", "\\":"BACKSLASH", ";":"SEMICOLON", "Left SHIFT":"LEFTSHIFT", \
+                    "Right SHIFT":"RIGHTSHIFT", "Left ALT":"LEFTALT", "Right ALT":"RIGHTALT", "Win":"LEFTMETA", \
+                    "Page Up":"PGUP", "Page Down":"PGDOWN", "#":"HASH", "+":"PLUS", "Å":"ARING", "^":"CARET", \
+                    "Ö":"ODIAERESIS", "Ä":"ADIAERESIS","*":"ASTERISK", ">":"LESS"}
+
 
 def info_normalize():
     for key, value in info.get("raw", {}).items():
@@ -192,15 +199,24 @@ def remove_key_ui():
 
 # setting things up from the metadata given
 
-def process_metadata():
+def process_metadata(lang=None):
+    global keys_to_press
+
+    def replace(l, old, new): # list helper
+        index = l.index(old)
+        l.pop(index)
+        l.insert(index, new)
+
     # if the keyboard has a numpad, we need to add the stereotypical numpad keys
     # into the keys_to_press list that's used for interactive key mapping
+    keys_to_press = copy(intl_keys_to_press)
     if info.get("has_numpad", False) and not all([key in keys_to_press for key in numpad_keys_to_press]):
         for key in numpad_keys_to_press:
             if key not in keys_to_press:
                 keys_to_press.append(key)
-    # if it's a UK keyboard, we need to move a few keys places
-    if info.get("lang", "") == "UK":
+    # if it's a UK/ND keyboard, we need to move a few keys places
+    lang = info.get("lang", "") if lang is None else lang
+    if lang == "UK":
         # moving the slash
         keys_to_press.remove('\\')
         slash_index = keys_to_press.index("Z")
@@ -209,7 +225,32 @@ def process_metadata():
         if '#' in keys_to_press: keys_to_press.remove('#')
         hash_index = keys_to_press.index("Enter")
         keys_to_press.insert(hash_index, '#')
+    elif lang == "ND" or lang.lower() in ["swedish", "danish"]:
+        # number row
+        replace(keys_to_press, '-', '+')
+        replace(keys_to_press, '=', '`')
+        # first row
+        replace(keys_to_press, '[', 'Å')
+        replace(keys_to_press, ']', '^')
+        keys_to_press.remove('\\')
+        # second row
+        replace(keys_to_press, ';', 'Ö')
+        replace(keys_to_press, "'", 'Ä')
+        asterisk_index = keys_to_press.index("Enter")
+        keys_to_press.insert(asterisk_index, '*')
+        # third row
+        slash_index = keys_to_press.index("Z")
+        keys_to_press.insert(slash_index, '>')
+        replace(keys_to_press, "/", '-')
     # TODO: process more language codes
+
+def print_lang_keys(lang):
+    # a test function that creates keys-to-press for different languages
+    global keys_to_press
+    keys_to_press_backup = copy(keys_to_press)
+    process_metadata(lang=lang)
+    print(", ".join([repr(key) for key in keys_to_press]))
+    keys_to_press = copy(keys_to_press_backup)
 
 # Messages
 
@@ -323,13 +364,6 @@ def scan_usual_keys(extra_keys = False):
  def get_last_pressed_key():
     last_pressed_key = keys_to_press[expected_key_index-1]
     return key_translations.get(last_pressed_key, last_pressed_key)
-
- def remove_key_from_data(key):
-    nonlocal expected_key_index
-    for k, v in data.items():
-        if v == key:
-            data.pop(k)
-            return
 
  def go_back():
     nonlocal expected_key_index
