@@ -144,6 +144,7 @@ def get_metadata():
     get_string("keeb_mfg", "Any idea on the keyboard manufacturer? Could be someone like \"Chicony\" or \"Darfon\".")
     get_string("pitch", "What is the pin pitch on your FPC? I.e. 1mm/0.8mm/0.5mm/other.")
     get_int("pin_count", "What's the amount of pins on your keyboard's FPC?")
+    get_int("fpc_offset", "Did you insert the keyboard into the connector with an offset? If so, enter the amount of pins that are unconnected (i.e. 1")
     get_bool("has_numpad", "Does your keyboard have a numpad?")
     get_bool("has_trackpoint", "Does your keyboard have a trackpoint?")
     get_bool("has_leds", "Does your keyboard have some LEDs embedded into the keys, i.e. CapsLock?")
@@ -159,6 +160,7 @@ def get_basic_metadata():
     get_bool("has_numpad", "Does your keyboard have a numpad?")
     get_bool("has_leds", "Does your keyboard have some LEDs embedded into the keys, i.e. CapsLock?")
     get_bool("has_power_button", "Does your keyboard have a power button?")
+    get_int("fpc_offset", "Did you insert the keyboard into the connector with an offset? If so, enter the amount of pins that are unconnected (i.e. 1")
     # now processing the metadata
     process_metadata()
 
@@ -428,6 +430,9 @@ def scan_usual_keys(extra_keys = False):
                 d1 = pin_mapping.index(s1+str(b)) # port and bit which we have set - get the pin number
                 d2 = pin_mapping.index(s2+str(n)) # port and bit where we got a response - get the pin number
                 d1, d2 = sorted([d1, d2]) # sort the pin numbers - so that connection between 1,2 and 2,1 is interpreted as the same connection
+                fpc_offset = info.get("fpc_offset", 0)
+                d1 -= fpc_offset
+                d2 -= fpc_offset
                 id = "{}-{}".format(d1, d2) # string ID for easily storing and looking up keys using a dictionary
                 info["shorted_pins"].append(id)
                 print("Pins {} and {} appear to be shorted together!".format(d1, d2))
@@ -460,6 +465,11 @@ def scan_usual_keys(extra_keys = False):
                 d1 = pin_mapping.index(s1+str(b)) # port and bit which we have set - get the pin number
                 d2 = pin_mapping.index(s2+str(n)) # port and bit where we got a response - get the pin number
                 d1, d2 = sorted([d1, d2]) # sort the pin numbers - so that connection between 1,2 and 2,1 is interpreted as the same connection
+                #print(d1, d2)
+                fpc_offset = info.get("fpc_offset", 0)
+                d1 -= fpc_offset
+                d2 -= fpc_offset
+                #print(d1, d2)
                 id = "{}-{}".format(d1, d2) # string ID for easily storing and looking up keys using a dictionary
                 if not extra_keys:
                   key = keys_to_press[expected_key_index] # key we currently expect
