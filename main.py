@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 import smbus
 
-__version__ = "0.2"
+__version__ = "0.3"
 
 # don't recall what this is for, but prolly used somewhere down there
 l = list
