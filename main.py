@@ -392,6 +392,7 @@ def scan_usual_keys(extra_keys = False):
 
  def scan_for_shorts():
   info["shorted_pins"] = []
+  ignored_pins = []
   for y, a, i, _, _, w, s1 in eps: # for each expander port
     for b in range(8): # picking one pin on the expander
       smr(a, i, 1<<b^0xFF) # setting one pin on the expander as input
@@ -399,7 +400,8 @@ def scan_usual_keys(extra_keys = False):
         d = gmr(ax, rx) # read the port
         if z == y: # if it's the same port where pin is being enabled,
           d |= 1<<b # ignore the pin that's being enabled
-        d = d ^ 0xFF # invert the port, since we're doing 'active low' logic
+        d = d ^ 0xFF # invert the port value, since we're doing 'active low' logic
+        #print(bin(d))
         if d != 0x00: # we got some pins set on this port!
             for n in range(8): # going through each bit,
               if d & (1 << n): # if any bit is set
@@ -409,11 +411,22 @@ def scan_usual_keys(extra_keys = False):
                 fpc_offset = info.get("fpc_offset", 0)
                 d1 -= fpc_offset
                 d2 -= fpc_offset
+                # seeing which pin to ignore
+                # if any of the two pins are outside of the connector (i.e. too wide of a pad on a shifted FPC), ignoring these
+                if d1 < 0:
+                    if d1 not in ignored_pins: ignored_pins.append(d1)
+                elif d2 < 0:
+                    if d2 not in ignored_pins: ignored_pins.append(d2)
+                else:
+                    # ignoring the largest pin
+                    pin = d2 if d2 > d1 else d1
+                    if pin not in ignored_pins: ignored_pins.append(pin)
                 id = "{}-{}".format(d1, d2) # string ID for easily storing and looking up keys using a dictionary
-                info["shorted_pins"].append(id)
-                print("Pins {} and {} appear to be shorted together!".format(d1, d2))
-                time.sleep(0.1)
-      smr(a, i, 0xFF) # after each port bit has been scanned, set all pins to zero (TODO: optimize so that this only gets done after the port is scanned (TODO: check if this is a valid todo at all))
+                if id not in info["shorted_pins"]:
+                    info["shorted_pins"].append(id)
+                    print("Pins {} and {} appear to be shorted together!".format(d1, d2))
+      smr(a, i, 0xFF) # after each port bit has been scanned, set all pins to zero (TODO: optimize so that this only gets done after the port is scanned (TODOTODO: check if this is a valid todo at all))
+  return ignored_pins
 
  # Start of interaction with the user
  if new_file: print(scanning_msg_new)
@@ -422,7 +435,7 @@ def scan_usual_keys(extra_keys = False):
  if advance_expected_key(increment_first=False) is None and not extra_keys:
     # an out of keys!
     print(''); return info
- scan_for_shorts()
+ ignored_pins = scan_for_shorts()
  help_offer()
  prompt_key()
  # main loop: infinite, breaks on 'return' statements
@@ -454,6 +467,9 @@ def scan_usual_keys(extra_keys = False):
                   key_trans = key = "your key" # for UI message purposes
                 if id in info["shorted_pins"]:
                   # just ignore
+                  pass
+                elif d1 in ignored_pins or d2 in ignored_pins:
+                  # also ignore - one of the pins is shorted to another
                   pass
                 elif next_key_is_fn:
                   if not "raw_fn_keys" in info: info["raw_fn_keys"] = {}
