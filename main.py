@@ -14,11 +14,17 @@ import smbus
 
 __version__ = "0.2"
 
+# don't recall what this is for, but prolly used somewhere down there
 l = list
 
-# TODO: add a yes/no helper function
-
 # TODO: properly add caps-insensitivity to keys_to_press
+# ... wait what?
+
+# globals
+bus = None
+info = {}
+
+# Key definitions for interactive scanning
 
 keys_to_press = ["Esc"] +\
                 ["F{}".format(i) for i in range(1, 13)] +\
@@ -52,41 +58,6 @@ def info_normalize():
         info["raw"][key] = key_translations.get(value, value).upper()
     for key, value in info.get("raw_fn_keys", {}).items():
         info["raw_fn_keys"][key] = key_translations.get(value, value).upper()
-
-# Creating the directory if it doesn't exist
-
-try:
-    os.mkdir('keebs/')
-except FileExistsError:
-    pass
-
-# Loading the file or creating a new one
-
-if len(sys.argv) > 1:
-    filename = sys.argv[1]
-    try:
-        with open(filename, 'r') as f:
-            info = json.load(f)
-    except:
-        print("Creating new file: {}".format(filename))
-        info = {}
-        new_file = True
-    else:
-        print("Loaded {}".format(filename))
-        new_file = False
-else:
-    ts = datetime.strftime(datetime.now(), "%y%m%d_%H%M%S")
-    filename = "keebs/keeb_{}.json".format(ts)
-    info = {}
-    new_file = True
-
-info_normalize()
-
-def save_file():
-    with open(filename, 'w') as f:
-        json.dump(info, f)
-
-save = save_data = save_file
 
 # questioning
 
@@ -268,12 +239,9 @@ def print_broken_keys():
   if info.get("broken_keys", []):
     print("This keyboard file has keys {} marked as broken".format(", ".join(info["broken_keys"])))
 
+# hardware definitions
+
 bus_num = 1
-try:
-    bus = smbus.SMBus(bus_num)
-except (PermissionError, IOError, FileNotFoundError):
-    print("WARNING: I can't open bus {}!".format(bus_num))
-    #traceback.print_exc()
 
 a1 = 0x21
 a2 = 0x22
@@ -336,7 +304,7 @@ def setup_for_leds():
         smr(a, i, 0x00) # setting all pins as outputs
         smr(a, p, 0x00) # disabling all pullups
 
-test_expander_presence()
+# I swear, this is going to be an object at some point! T___T
 
 def scan_usual_keys(extra_keys = False):
  """ Interactive key picker """
@@ -720,6 +688,20 @@ def get_table():
             print("Key {} placement weirdness: both {} and {} are {}! Skipping".format(key, a1, a2, t))
     info["table"] = table
 
+# Loading the file or creating a new one
+
+def save_file():
+    with open(filename, 'w') as f:
+        json.dump(info, f)
+
+save = save_data = save_file
+
+def load_file(filename):
+    global info
+    with open(filename, 'r') as f:
+        info = json.load(f)
+    info_normalize()
+
 # Main UI stuff starts here
 
 def print_filename():
@@ -807,6 +789,38 @@ def main():
     main_menu()
 
 if __name__ == "__main__":
+
+    try:
+        bus = smbus.SMBus(bus_num)
+    except (PermissionError, IOError, FileNotFoundError):
+        print("WARNING: I can't open bus {}!".format(bus_num))
+        #traceback.print_exc()
+    else:
+        test_expander_presence()
+
+    # Creating the directory if it doesn't exist
+    try:
+        os.mkdir('keebs/')
+    except FileExistsError:
+        pass
+
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        try:
+            load_file(filename)
+        except:
+            print("Creating new file: {}".format(filename))
+            info = {}
+            new_file = True
+        else:
+            print("Loaded {}".format(filename))
+            new_file = False
+    else:
+        ts = datetime.strftime(datetime.now(), "%y%m%d_%H%M%S")
+        filename = "keebs/keeb_{}.json".format(ts)
+        info = {}
+        new_file = True
+
     main()
 
 """
