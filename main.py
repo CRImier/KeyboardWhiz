@@ -50,7 +50,7 @@ key_translations = {".":"DOT", ",":"COMMA", "/":"SLASH", "'":"APOSTROPHE", "[":"
                     "=": "EQUAL", "-":"MINUS", "`":"GRAVE", "\\":"BACKSLASH", ";":"SEMICOLON", "Left SHIFT":"LEFTSHIFT", \
                     "Right SHIFT":"RIGHTSHIFT", "Left ALT":"LEFTALT", "Right ALT":"RIGHTALT", "Win":"LEFTMETA", \
                     "Page Up":"PGUP", "Page Down":"PGDOWN", "#":"HASH", "+":"PLUS", "Å":"ARING", "^":"CARET", \
-                    "Ö":"ODIAERESIS", "Ä":"ADIAERESIS","*":"ASTERISK", ">":"LESS"}
+                    "Ö":"ODIAERESIS", "Ä":"ADIAERESIS","*":"ASTERISK", ">":"LESS", "§":"SECTION"}
 
 
 def info_normalize():
@@ -202,6 +202,7 @@ def process_metadata(lang=None):
         keys_to_press.insert(hash_index, '#')
     elif lang == "ND" or lang.lower() in ["swedish", "danish"]:
         # number row
+        replace(keys_to_press, '`', '§')
         replace(keys_to_press, '-', '+')
         replace(keys_to_press, '=', '`')
         # first row
